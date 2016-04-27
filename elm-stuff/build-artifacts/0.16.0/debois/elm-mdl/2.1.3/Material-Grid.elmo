@@ -1,0 +1,108 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Grid = Elm.Material.Grid || {};
+Elm.Material.Grid.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Grid = _elm.Material.Grid || {};
+   if (_elm.Material.Grid.values) return _elm.Material.Grid.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Helpers = Elm.Material.Helpers.make(_elm),
+   $Material$Style = Elm.Material.Style.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var align = function (a) {
+      var _p0 = a;
+      switch (_p0.ctor)
+      {case "Top": return $Material$Style.cs("mdl-cell--top");
+         case "Middle": return $Material$Style.cs("mdl-cell--middle");
+         default: return $Material$Style.cs("mdl-cell--bottom");}
+   };
+   var Bottom = {ctor: "Bottom"};
+   var Middle = {ctor: "Middle"};
+   var Top = {ctor: "Top"};
+   var suffix = function (device) {
+      var _p1 = device;
+      switch (_p1.ctor)
+      {case "All": return "";
+         case "Desktop": return "-desktop";
+         case "Tablet": return "-tablet";
+         default: return "-phone";}
+   };
+   var size = F2(function (device,k) {
+      var c = function () {
+         var _p2 = device;
+         switch (_p2.ctor)
+         {case "All": return A3($Material$Helpers.clip,1,12,k);
+            case "Desktop": return A3($Material$Helpers.clip,1,12,k);
+            case "Tablet": return A3($Material$Helpers.clip,1,8,k);
+            default: return A3($Material$Helpers.clip,1,4,k);}
+      }();
+      return $Material$Style.cs(A2($Basics._op["++"],"mdl-cell--",A2($Basics._op["++"],$Basics.toString(c),A2($Basics._op["++"],"-col",suffix(device)))));
+   });
+   var offset = F2(function (device,k) {
+      var c = function () {
+         var _p3 = device;
+         switch (_p3.ctor)
+         {case "All": return A3($Material$Helpers.clip,1,11,k);
+            case "Desktop": return A3($Material$Helpers.clip,1,11,k);
+            case "Tablet": return A3($Material$Helpers.clip,1,7,k);
+            default: return A3($Material$Helpers.clip,1,3,k);}
+      }();
+      return $Material$Style.cs(A2($Basics._op["++"],"mdl-cell--",A2($Basics._op["++"],$Basics.toString(c),A2($Basics._op["++"],"-offset",suffix(device)))));
+   });
+   var hide = function (device) {
+      return $Material$Style.cs(function () {
+         var _p4 = device;
+         if (_p4.ctor === "All") {
+               return "";
+            } else {
+               return A2($Basics._op["++"],"mdl-cell--hide-",suffix(device));
+            }
+      }());
+   };
+   var order = F2(function (device,n) {
+      return $Material$Style.cs(A2($Basics._op["++"],
+      "mdl-cell--order-",
+      A2($Basics._op["++"],$Basics.toString(A3($Material$Helpers.clip,1,12,n)),suffix(device))));
+   });
+   var Cell = function (a) {    return {ctor: "Cell",_0: a};};
+   var cell = F2(function (styling,elms) {
+      return Cell(A4($Material$Style.styled,$Html.div,A2($List._op["::"],$Material$Style.cs("mdl-cell"),styling),_U.list([]),elms));
+   });
+   var Phone = {ctor: "Phone"};
+   var Tablet = {ctor: "Tablet"};
+   var Desktop = {ctor: "Desktop"};
+   var All = {ctor: "All"};
+   var grid = F2(function (styling,cells) {
+      return A4($Material$Style.styled,
+      $Html.div,
+      A2($List._op["::"],$Material$Style.cs("mdl-grid"),styling),
+      _U.list([]),
+      A2($List.map,function (_p5) {    var _p6 = _p5;return _p6._0;},cells));
+   });
+   var maxWidth = function (w) {    return A2($Material$Style.css,"max-width",w);};
+   var noSpacing = $Material$Style.cs("mdl-grid--no-spacing");
+   return _elm.Material.Grid.values = {_op: _op
+                                      ,grid: grid
+                                      ,noSpacing: noSpacing
+                                      ,maxWidth: maxWidth
+                                      ,cell: cell
+                                      ,size: size
+                                      ,offset: offset
+                                      ,align: align
+                                      ,hide: hide
+                                      ,order: order
+                                      ,All: All
+                                      ,Desktop: Desktop
+                                      ,Tablet: Tablet
+                                      ,Phone: Phone
+                                      ,Top: Top
+                                      ,Middle: Middle
+                                      ,Bottom: Bottom};
+};

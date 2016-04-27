@@ -1,0 +1,105 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Button = Elm.Material.Button || {};
+Elm.Material.Button.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Button = _elm.Material.Button || {};
+   if (_elm.Material.Button.values) return _elm.Material.Button.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Component = Elm.Material.Component.make(_elm),
+   $Material$Helpers = Elm.Material.Helpers.make(_elm),
+   $Material$Ripple = Elm.Material.Ripple.make(_elm),
+   $Material$Style = Elm.Material.Style.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var fwdClick = F2(function (obs,action) {    var _p0 = action;if (_p0.ctor === "Click") {    return $Maybe.Just(obs);} else {    return $Maybe.Nothing;}});
+   var accent = $Material$Style.cs("mdl-button--accent");
+   var primary = $Material$Style.cs("mdl-button--primary");
+   var colored = $Material$Style.cs("mdl-button--colored");
+   var Click = {ctor: "Click"};
+   var Ripple = function (a) {    return {ctor: "Ripple",_0: a};};
+   var S = function (a) {    return {ctor: "S",_0: a};};
+   var model = function (shouldRipple) {    return shouldRipple ? S($Maybe.Just($Material$Ripple.model)) : S($Maybe.Nothing);};
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      if (_p1.ctor === "Click") {
+            return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         } else {
+            var _p2 = model;
+            if (_p2._0.ctor === "Just") {
+                  var _p3 = A2($Material$Ripple.update,_p1._0,_p2._0._0);
+                  var ripple$ = _p3._0;
+                  var e = _p3._1;
+                  return {ctor: "_Tuple2",_0: S($Maybe.Just(ripple$)),_1: A2($Effects.map,Ripple,e)};
+               } else {
+                  return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+               }
+         }
+   });
+   var instance = F5(function (id,lift,view,model0,observers) {
+      return A8($Material$Component.instance,
+      view,
+      update,
+      function (_) {
+         return _.button;
+      },
+      F2(function (x,y) {    return _U.update(y,{button: x});}),
+      id,
+      lift,
+      model0,
+      observers);
+   });
+   var view = F5(function (kind,addr,model,styling,html) {
+      return A4($Material$Style.styled,
+      $Html.button,
+      A2($List._op["::"],
+      $Material$Style.cs("mdl-button"),
+      A2($List._op["::"],
+      $Material$Style.cs("mdl-js-button"),
+      A2($List._op["::"],
+      A2($Material$Style.cs$,"mdl-js-ripple-effect",!_U.eq(model,S($Maybe.Nothing))),
+      A2($List._op["::"],A2($Material$Style.cs$,kind,!_U.eq(kind,"")),styling)))),
+      _U.list([$Material$Helpers.blurOn("mouseup"),$Material$Helpers.blurOn("mouseleave"),A2($Html$Events.onClick,addr,Click)]),
+      function () {
+         var _p4 = model;
+         if (_p4._0.ctor === "Just") {
+               return A2($List._op["::"],
+               A3($Material$Ripple.view,
+               A2($Signal.forwardTo,addr,Ripple),
+               _U.list([$Html$Attributes.$class("mdl-button__ripple-container"),$Material$Helpers.blurOn("mouseup")]),
+               _p4._0._0),
+               html);
+            } else {
+               return html;
+            }
+      }());
+   });
+   var flat = view("");
+   var raised = view("mdl-button--raised");
+   var fab = view("mdl-button--fab");
+   var minifab = view("mdl-button--mini-fab");
+   var icon = view("mdl-button--icon");
+   return _elm.Material.Button.values = {_op: _op
+                                        ,model: model
+                                        ,update: update
+                                        ,flat: flat
+                                        ,raised: raised
+                                        ,fab: fab
+                                        ,minifab: minifab
+                                        ,icon: icon
+                                        ,colored: colored
+                                        ,primary: primary
+                                        ,accent: accent
+                                        ,instance: instance
+                                        ,fwdClick: fwdClick
+                                        ,Click: Click};
+};

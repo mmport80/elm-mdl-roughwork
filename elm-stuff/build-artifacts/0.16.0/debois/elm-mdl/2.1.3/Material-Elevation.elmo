@@ -1,0 +1,36 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Elevation = Elm.Material.Elevation || {};
+Elm.Material.Elevation.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Elevation = _elm.Material.Elevation || {};
+   if (_elm.Material.Elevation.values) return _elm.Material.Elevation.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Style = Elm.Material.Style.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var transition = function (duration) {
+      return A2($Material$Style.css,"transition",A2($Basics._op["++"],"box-shadow ",A2($Basics._op["++"],$Basics.toString(duration),"ms ease-in-out 0s")));
+   };
+   var shadow = function (z) {    return $Material$Style.cs(A2($Basics._op["++"],"mdl-shadow--",A2($Basics._op["++"],$Basics.toString(z),"dp")));};
+   var e2 = shadow(2);
+   var e3 = shadow(3);
+   var e4 = shadow(4);
+   var e6 = shadow(6);
+   var e8 = shadow(8);
+   var e16 = shadow(16);
+   var e24 = shadow(24);
+   var elevations = _U.list([{ctor: "_Tuple2",_0: e2,_1: 2}
+                            ,{ctor: "_Tuple2",_0: e3,_1: 3}
+                            ,{ctor: "_Tuple2",_0: e4,_1: 4}
+                            ,{ctor: "_Tuple2",_0: e6,_1: 6}
+                            ,{ctor: "_Tuple2",_0: e8,_1: 8}
+                            ,{ctor: "_Tuple2",_0: e16,_1: 16}
+                            ,{ctor: "_Tuple2",_0: e24,_1: 24}]);
+   return _elm.Material.Elevation.values = {_op: _op,e2: e2,e3: e3,e4: e4,e6: e6,e8: e8,e16: e16,e24: e24,elevations: elevations,transition: transition};
+};

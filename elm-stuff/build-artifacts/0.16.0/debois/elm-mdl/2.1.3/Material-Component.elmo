@@ -1,0 +1,106 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Component = Elm.Material.Component || {};
+Elm.Material.Component.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Component = _elm.Material.Component || {};
+   if (_elm.Material.Component.values) return _elm.Material.Component.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Helpers = Elm.Material.Helpers.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var pick = F2(function (f,xs) {
+      pick: while (true) {
+         var _p0 = xs;
+         if (_p0.ctor === "[]") {
+               return $Maybe.Nothing;
+            } else {
+               var _p1 = f(_p0._0);
+               if (_p1.ctor === "Nothing") {
+                     var _v2 = f,_v3 = _p0._1;
+                     f = _v2;
+                     xs = _v3;
+                     continue pick;
+                  } else {
+                     return _p1;
+                  }
+            }
+      }
+   });
+   var connect = F2(function (observers,subaction) {    return A2(pick,F2(function (x,y) {    return y(x);})(subaction),observers);});
+   var observe = F3(function (f,update,action) {
+      return function (_p2) {
+         return function (_p3) {
+            var _p4 = _p3;
+            return {ctor: "_Tuple3",_0: _p4._0,_1: _p4._1,_2: f(action)};
+         }(A2(update,action,_p2));
+      };
+   });
+   var Instance = F5(function (a,b,c,d,e) {    return {view: a,get: b,set: c,map: d,fwd: e};});
+   var update = F3(function (fwd,_p5,container) {
+      var _p6 = _p5;
+      var _p7 = A2($Material$Helpers.map2,$Effects.map(fwd),_p6._0(container));
+      var container$ = _p7._0;
+      var fx = _p7._1;
+      var obs = _p7._2;
+      var _p8 = obs;
+      if (_p8.ctor === "Nothing") {
+            return {ctor: "_Tuple2",_0: container$,_1: fx};
+         } else {
+            return {ctor: "_Tuple2",_0: container$,_1: $Effects.batch(_U.list([fx,$Effects.task($Task.succeed(_p8._0))]))};
+         }
+   });
+   var A = function (a) {    return {ctor: "A",_0: a};};
+   var pack = F2(function (update,action) {
+      return A(function (_p9) {    return A2($Material$Helpers.map2,$Effects.map(pack(update)),A2(update,action,_p9));});
+   });
+   var instance$ = F3(function (lift,observers,embedding) {
+      var set = embedding.setModel;
+      var get = embedding.getModel;
+      var fwd = function (_p10) {    return lift(A2(pack,A2(observe,connect(observers),embedding.update),_p10));};
+      return {view: function (addr) {
+                return embedding.view(A2($Signal.forwardTo,addr,fwd));
+             }
+             ,get: get
+             ,set: set
+             ,map: F2(function (f,model) {    return A2(set,f(get(model)),model);})
+             ,fwd: fwd};
+   });
+   var embed = F4(function (view,update,get,set) {
+      return {view: F2(function (addr,model) {    return A2(view,addr,get(model));})
+             ,update: F2(function (action,model) {    return A2($Material$Helpers.map1st,A2($Basics.flip,set,model),A2(update,action,get(model)));})
+             ,getModel: get
+             ,setModel: set};
+   });
+   var embedIndexed = F6(function (view,update,get,set,model0,id) {
+      var set$ = F2(function (submodel,model) {    return A2(set,A3($Dict.insert,id,submodel,get(model)),model);});
+      var get$ = function (model) {    return A2($Maybe.withDefault,model0,A2($Dict.get,id,get(model)));};
+      return A4(embed,view,update,get$,set$);
+   });
+   var instance = F8(function (view,update,get,set,id,lift,model0,observers) {
+      return A3(instance$,lift,observers,A6(embedIndexed,view,update,get,set,model0,id));
+   });
+   var instance1 = F7(function (view,update,get,set,lift,model0,observers) {
+      return A3(instance$,
+      lift,
+      observers,
+      A4(embed,view,update,function (_p11) {    return A2($Maybe.withDefault,model0,get(_p11));},function (_p12) {    return set($Maybe.Just(_p12));}));
+   });
+   var Embedding = F4(function (a,b,c,d) {    return {view: a,update: b,getModel: c,setModel: d};});
+   return _elm.Material.Component.values = {_op: _op
+                                           ,embed: embed
+                                           ,embedIndexed: embedIndexed
+                                           ,instance: instance
+                                           ,instance1: instance1
+                                           ,update: update
+                                           ,Embedding: Embedding
+                                           ,Instance: Instance};
+};

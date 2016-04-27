@@ -1,0 +1,147 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Ripple = Elm.Material.Ripple || {};
+Elm.Material.Ripple.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Ripple = _elm.Material.Ripple || {};
+   if (_elm.Material.Ripple.values) return _elm.Material.Ripple.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $DOM = Elm.DOM.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Helpers = Elm.Material.Helpers.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var styles = F2(function (m,frame) {
+      var r = m.rect;
+      var toPx = function (k) {    return A2($Basics._op["++"],$Basics.toString($Basics.round(k)),"px");};
+      var offset = A2($Basics._op["++"],"translate(",A2($Basics._op["++"],toPx(m.x),A2($Basics._op["++"],", ",A2($Basics._op["++"],toPx(m.y),")"))));
+      var rippleSize = toPx($Basics.sqrt(r.width * r.width + r.height * r.height) * 2.0 + 2.0);
+      var scale = _U.eq(frame,0) ? "scale(0.0001, 0.0001)" : "";
+      var transformString = A2($Basics._op["++"],"translate(-50%, -50%) ",A2($Basics._op["++"],offset,scale));
+      return _U.list([{ctor: "_Tuple2",_0: "width",_1: rippleSize}
+                     ,{ctor: "_Tuple2",_0: "height",_1: rippleSize}
+                     ,{ctor: "_Tuple2",_0: "-webkit-transform",_1: transformString}
+                     ,{ctor: "_Tuple2",_0: "-ms-transform",_1: transformString}
+                     ,{ctor: "_Tuple2",_0: "transform",_1: transformString}]);
+   });
+   var Tick = {ctor: "Tick"};
+   var Up = {ctor: "Up"};
+   var upOn = F2(function (name,addr) {
+      return A3($Html$Events.on,
+      name,
+      $Json$Decode.succeed({ctor: "_Tuple0"}),
+      function (_p0) {
+         return A2($Signal.message,addr,function (_p1) {    return Up;}(_p0));
+      });
+   });
+   var Down = function (a) {    return {ctor: "Down",_0: a};};
+   var Geometry = F5(function (a,b,c,d,e) {    return {rect: a,clientX: b,clientY: c,touchX: d,touchY: e};});
+   var geometryDecoder = A6($Json$Decode.object5,
+   Geometry,
+   $DOM.target($DOM.boundingClientRect),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"clientX",$Json$Decode.$float)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"clientY",$Json$Decode.$float)),
+   $Json$Decode.maybe(A2($Json$Decode.at,_U.list(["touches","0","clientX"]),$Json$Decode.$float)),
+   $Json$Decode.maybe(A2($Json$Decode.at,_U.list(["touches","0","clientY"]),$Json$Decode.$float)));
+   var downOn = F2(function (name,addr) {    return A3($Html$Events.on,name,geometryDecoder,function (_p2) {    return A2($Signal.message,addr,Down(_p2));});});
+   var Model = F2(function (a,b) {    return {animation: a,metrics: b};});
+   var Inert = {ctor: "Inert"};
+   var model = {animation: Inert,metrics: $Maybe.Nothing};
+   var Frame = function (a) {    return {ctor: "Frame",_0: a};};
+   var view = F3(function (addr,attrs,model) {
+      var styling = function () {
+         var _p3 = {ctor: "_Tuple2",_0: model.metrics,_1: model.animation};
+         if (_p3.ctor === "_Tuple2" && _p3._0.ctor === "Just") {
+               if (_p3._1.ctor === "Frame") {
+                     return A2(styles,_p3._0._0,_p3._1._0);
+                  } else {
+                     return A2(styles,_p3._0._0,1);
+                  }
+            } else {
+               return _U.list([]);
+            }
+      }();
+      return A2($Html.span,
+      A2($List._op["::"],
+      A2(downOn,"mousedown",addr),
+      A2($List._op["::"],
+      A2(downOn,"touchstart",addr),
+      A2($List._op["::"],
+      A2(upOn,"mouseup",addr),
+      A2($List._op["::"],A2(upOn,"mouseleave",addr),A2($List._op["::"],A2(upOn,"touchend",addr),A2($List._op["::"],A2(upOn,"blur",addr),attrs)))))),
+      _U.list([A2($Html.span,
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "mdl-ripple",_1: true}
+                                                  ,{ctor: "_Tuple2",_0: "is-animating",_1: !_U.eq(model.animation,Frame(0))}
+                                                  ,{ctor: "_Tuple2",_0: "is-visible",_1: !_U.eq(model.animation,Inert)}]))
+              ,$Html$Attributes.style(styling)]),
+      _U.list([]))]));
+   });
+   var Metrics = F3(function (a,b,c) {    return {rect: a,x: b,y: c};});
+   var computeMetrics = function (g) {
+      var rect = g.rect;
+      var set = F2(function (x,y) {    return $Maybe.Just({ctor: "_Tuple2",_0: x - rect.left,_1: y - rect.top});});
+      return A2($Maybe.map,
+      function (_p4) {
+         var _p5 = _p4;
+         return A3(Metrics,rect,_p5._0,_p5._1);
+      },
+      function () {
+         var _p6 = {ctor: "_Tuple4",_0: g.clientX,_1: g.clientY,_2: g.touchX,_3: g.touchY};
+         _v2_3: do {
+            if (_p6.ctor === "_Tuple4") {
+                  if (_p6._0.ctor === "Just" && _p6._1.ctor === "Just") {
+                        if (_p6._0._0 === 0.0 && _p6._1._0 === 0.0) {
+                              return $Maybe.Just({ctor: "_Tuple2",_0: rect.width / 2.0,_1: rect.height / 2.0});
+                           } else {
+                              return A2(set,_p6._0._0,_p6._1._0);
+                           }
+                     } else {
+                        if (_p6._2.ctor === "Just" && _p6._3.ctor === "Just") {
+                              return A2(set,_p6._2._0,_p6._3._0);
+                           } else {
+                              break _v2_3;
+                           }
+                     }
+               } else {
+                  break _v2_3;
+               }
+         } while (false);
+         return $Maybe.Nothing;
+      }());
+   };
+   var update = F2(function (action,model) {
+      var _p7 = action;
+      switch (_p7.ctor)
+      {case "Down": return A2($Material$Helpers.effect,
+           $Effects.tick(function (_p8) {    return Tick;}),
+           _U.update(model,{animation: Frame(0),metrics: computeMetrics(_p7._0)}));
+         case "Up": return A2($Material$Helpers.effect,$Effects.none,_U.update(model,{animation: Inert}));
+         default: return A2($Material$Helpers.effect,$Effects.none,_U.update(model,{animation: Frame(1)}));}
+   });
+   return _elm.Material.Ripple.values = {_op: _op
+                                        ,Metrics: Metrics
+                                        ,Frame: Frame
+                                        ,Inert: Inert
+                                        ,Model: Model
+                                        ,model: model
+                                        ,Geometry: Geometry
+                                        ,geometryDecoder: geometryDecoder
+                                        ,computeMetrics: computeMetrics
+                                        ,Down: Down
+                                        ,Up: Up
+                                        ,Tick: Tick
+                                        ,update: update
+                                        ,downOn: downOn
+                                        ,upOn: upOn
+                                        ,styles: styles
+                                        ,view: view};
+};

@@ -1,0 +1,27 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Icon = Elm.Material.Icon || {};
+Elm.Material.Icon.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Icon = _elm.Material.Icon || {};
+   if (_elm.Material.Icon.values) return _elm.Material.Icon.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Style = Elm.Material.Style.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = F3(function (name,styling,attrs) {
+      return A4($Material$Style.styled,$Html.i,A2($List._op["::"],$Material$Style.cs("material-icons"),styling),attrs,_U.list([$Html.text(name)]));
+   });
+   var i = function (name) {    return A3(view,name,_U.list([]),_U.list([]));};
+   var size48 = A2($Material$Style.css,"font-size","48px");
+   var size36 = A2($Material$Style.css,"font-size","36px");
+   var size24 = A2($Material$Style.css,"font-size","24px");
+   var size18 = A2($Material$Style.css,"font-size","18px");
+   return _elm.Material.Icon.values = {_op: _op,size18: size18,size24: size24,size36: size36,size48: size48,view: view,i: i};
+};

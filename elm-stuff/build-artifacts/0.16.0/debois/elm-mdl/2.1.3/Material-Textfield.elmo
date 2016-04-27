@@ -1,0 +1,112 @@
+Elm.Material = Elm.Material || {};
+Elm.Material.Textfield = Elm.Material.Textfield || {};
+Elm.Material.Textfield.make = function (_elm) {
+   "use strict";
+   _elm.Material = _elm.Material || {};
+   _elm.Material.Textfield = _elm.Material.Textfield || {};
+   if (_elm.Material.Textfield.values) return _elm.Material.Textfield.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Material$Component = Elm.Material.Component.make(_elm),
+   $Material$Helpers = Elm.Material.Helpers.make(_elm),
+   $Material$Style = Elm.Material.Style.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var fwdFocus = F2(function (o,action) {    var _p0 = action;if (_p0.ctor === "Focus") {    return $Maybe.Just(o);} else {    return $Maybe.Nothing;}});
+   var fwdBlur = F2(function (o,action) {    var _p1 = action;if (_p1.ctor === "Blur") {    return $Maybe.Just(o);} else {    return $Maybe.Nothing;}});
+   var fwdInput = F2(function (f,action) {
+      var _p2 = action;
+      if (_p2.ctor === "Input") {
+            return $Maybe.Just(f(_p2._0));
+         } else {
+            return $Maybe.Nothing;
+         }
+   });
+   var update = F2(function (action,model) {
+      var _p3 = action;
+      switch (_p3.ctor)
+      {case "Input": return _U.update(model,{value: _p3._0});
+         case "Blur": return _U.update(model,{isFocused: false});
+         default: return _U.update(model,{isFocused: true});}
+   });
+   var Focus = {ctor: "Focus"};
+   var Blur = {ctor: "Blur"};
+   var Input = function (a) {    return {ctor: "Input",_0: a};};
+   var view = F3(function (addr,model,styles) {
+      var labelText = A2($Maybe.map,function (_) {    return _.text;},model.label);
+      var hasError = A2($Maybe.withDefault,false,A2($Maybe.map,$Basics.always(true),model.error));
+      var hasFloat = A2($Maybe.withDefault,false,A2($Maybe.map,function (_) {    return _.$float;},model.label));
+      return A3($Material$Helpers.filter,
+      $Material$Style.div,
+      A2($List._op["::"],
+      $Material$Style.cs("mdl-textfield"),
+      A2($List._op["::"],
+      $Material$Style.cs("mdl-js-textfield"),
+      A2($List._op["::"],
+      $Material$Style.cs("is-upgraded"),
+      A2($List._op["::"],
+      A2($Material$Style.cs$,"mdl-textfield--floating-label",hasFloat),
+      A2($List._op["::"],
+      A2($Material$Style.cs$,"is-invalid",hasError),
+      A2($List._op["::"],
+      A2($Material$Style.cs$,"is-dirty",!_U.eq(model.value,"")),
+      A2($List._op["::"],
+      A2($Material$Style.cs$,"is-focused",model.isFocused && $Basics.not(model.isDisabled)),
+      A2($List._op["::"],A2($Material$Style.cs$,"is-disabled",model.isDisabled),styles)))))))),
+      _U.list([$Maybe.Just(A2($Html.input,
+              _U.list([$Html$Attributes.$class("mdl-textfield__input")
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "outline",_1: "none"}]))
+                      ,$Html$Attributes.type$("text")
+                      ,$Html$Attributes.disabled(model.isDisabled)
+                      ,$Html$Attributes.value(model.value)
+                      ,A3($Html$Events.on,"input",$Html$Events.targetValue,function (s) {    return A2($Signal.message,addr,Input(s));})
+                      ,A2($Html$Events.onBlur,addr,Blur)
+                      ,A2($Html$Events.onFocus,addr,Focus)]),
+              _U.list([])))
+              ,$Maybe.Just(A2($Html.label,
+              _U.list([$Html$Attributes.$class("mdl-textfield__label")]),
+              function () {
+                 var _p4 = labelText;
+                 if (_p4.ctor === "Just") {
+                       return _U.list([$Html.text(_p4._0)]);
+                    } else {
+                       return _U.list([]);
+                    }
+              }()))
+              ,A2($Maybe.map,
+              function (e) {
+                 return A2($Html.span,_U.list([$Html$Attributes.$class("mdl-textfield__error")]),_U.list([$Html.text(e)]));
+              },
+              model.error)]));
+   });
+   var instance = function () {
+      var update$ = F2(function (action,model) {    return {ctor: "_Tuple2",_0: A2(update,action,model),_1: $Effects.none};});
+      return A4($Material$Component.instance,view,update$,function (_) {    return _.textfield;},F2(function (x,y) {    return _U.update(y,{textfield: x});}));
+   }();
+   var Model = F6(function (a,b,c,d,e,f) {    return {label: a,error: b,kind: c,isDisabled: d,isFocused: e,value: f};});
+   var SingleLine = {ctor: "SingleLine"};
+   var model = {label: $Maybe.Nothing,error: $Maybe.Nothing,kind: SingleLine,isDisabled: false,isFocused: false,value: ""};
+   var Label = F2(function (a,b) {    return {text: a,$float: b};});
+   return _elm.Material.Textfield.values = {_op: _op
+                                           ,Label: Label
+                                           ,SingleLine: SingleLine
+                                           ,Model: Model
+                                           ,model: model
+                                           ,Input: Input
+                                           ,Blur: Blur
+                                           ,Focus: Focus
+                                           ,update: update
+                                           ,view: view
+                                           ,instance: instance
+                                           ,fwdInput: fwdInput
+                                           ,fwdBlur: fwdBlur
+                                           ,fwdFocus: fwdFocus};
+};
