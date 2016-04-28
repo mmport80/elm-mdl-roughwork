@@ -11687,6 +11687,165 @@ Elm.Material.Scheme.make = function (_elm) {
    var top = function (content) {    return A3(topWithScheme,$Material$Color.Grey,$Material$Color.Grey,content);};
    return _elm.Material.Scheme.values = {_op: _op,topWithScheme: topWithScheme,top: top};
 };
+Elm.Native.Regex = {};
+Elm.Native.Regex.make = function(localRuntime) {
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Regex = localRuntime.Native.Regex || {};
+	if (localRuntime.Native.Regex.values)
+	{
+		return localRuntime.Native.Regex.values;
+	}
+	if ('values' in Elm.Native.Regex)
+	{
+		return localRuntime.Native.Regex.values = Elm.Native.Regex.values;
+	}
+
+	var List = Elm.Native.List.make(localRuntime);
+	var Maybe = Elm.Maybe.make(localRuntime);
+
+	function escape(str)
+	{
+		return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+	}
+	function caseInsensitive(re)
+	{
+		return new RegExp(re.source, 'gi');
+	}
+	function regex(raw)
+	{
+		return new RegExp(raw, 'g');
+	}
+
+	function contains(re, string)
+	{
+		return string.match(re) !== null;
+	}
+
+	function find(n, re, str)
+	{
+		n = n.ctor === 'All' ? Infinity : n._0;
+		var out = [];
+		var number = 0;
+		var string = str;
+		var lastIndex = re.lastIndex;
+		var prevLastIndex = -1;
+		var result;
+		while (number++ < n && (result = re.exec(string)))
+		{
+			if (prevLastIndex === re.lastIndex) break;
+			var i = result.length - 1;
+			var subs = new Array(i);
+			while (i > 0)
+			{
+				var submatch = result[i];
+				subs[--i] = submatch === undefined
+					? Maybe.Nothing
+					: Maybe.Just(submatch);
+			}
+			out.push({
+				match: result[0],
+				submatches: List.fromArray(subs),
+				index: result.index,
+				number: number
+			});
+			prevLastIndex = re.lastIndex;
+		}
+		re.lastIndex = lastIndex;
+		return List.fromArray(out);
+	}
+
+	function replace(n, re, replacer, string)
+	{
+		n = n.ctor === 'All' ? Infinity : n._0;
+		var count = 0;
+		function jsReplacer(match)
+		{
+			if (count++ >= n)
+			{
+				return match;
+			}
+			var i = arguments.length - 3;
+			var submatches = new Array(i);
+			while (i > 0)
+			{
+				var submatch = arguments[i];
+				submatches[--i] = submatch === undefined
+					? Maybe.Nothing
+					: Maybe.Just(submatch);
+			}
+			return replacer({
+				match: match,
+				submatches: List.fromArray(submatches),
+				index: arguments[i - 1],
+				number: count
+			});
+		}
+		return string.replace(re, jsReplacer);
+	}
+
+	function split(n, re, str)
+	{
+		n = n.ctor === 'All' ? Infinity : n._0;
+		if (n === Infinity)
+		{
+			return List.fromArray(str.split(re));
+		}
+		var string = str;
+		var result;
+		var out = [];
+		var start = re.lastIndex;
+		while (n--)
+		{
+			if (!(result = re.exec(string))) break;
+			out.push(string.slice(start, result.index));
+			start = re.lastIndex;
+		}
+		out.push(string.slice(start));
+		return List.fromArray(out);
+	}
+
+	return Elm.Native.Regex.values = {
+		regex: regex,
+		caseInsensitive: caseInsensitive,
+		escape: escape,
+
+		contains: F2(contains),
+		find: F3(find),
+		replace: F4(replace),
+		split: F3(split)
+	};
+};
+
+Elm.Regex = Elm.Regex || {};
+Elm.Regex.make = function (_elm) {
+   "use strict";
+   _elm.Regex = _elm.Regex || {};
+   if (_elm.Regex.values) return _elm.Regex.values;
+   var _U = Elm.Native.Utils.make(_elm),$Maybe = Elm.Maybe.make(_elm),$Native$Regex = Elm.Native.Regex.make(_elm);
+   var _op = {};
+   var split = $Native$Regex.split;
+   var replace = $Native$Regex.replace;
+   var find = $Native$Regex.find;
+   var AtMost = function (a) {    return {ctor: "AtMost",_0: a};};
+   var All = {ctor: "All"};
+   var Match = F4(function (a,b,c,d) {    return {match: a,submatches: b,index: c,number: d};});
+   var contains = $Native$Regex.contains;
+   var caseInsensitive = $Native$Regex.caseInsensitive;
+   var regex = $Native$Regex.regex;
+   var escape = $Native$Regex.escape;
+   var Regex = {ctor: "Regex"};
+   return _elm.Regex.values = {_op: _op
+                              ,regex: regex
+                              ,escape: escape
+                              ,caseInsensitive: caseInsensitive
+                              ,contains: contains
+                              ,find: find
+                              ,replace: replace
+                              ,split: split
+                              ,Match: Match
+                              ,All: All
+                              ,AtMost: AtMost};
+};
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.make = function (_elm) {
    "use strict";
@@ -11743,69 +11902,87 @@ Elm.Main.make = function (_elm) {
    $Material$Scheme = Elm.Material.Scheme.make(_elm),
    $Material$Textfield = Elm.Material.Textfield.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Regex = Elm.Regex.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
    var inputs = _U.list([]);
-   var map1st = F2(function (f,_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: f(_p1._0),_1: _p1._1};});
-   var reset = function (model) {    return _U.update(model,{count: 0});};
-   var increase = function (model) {    return _U.update(model,{count: model.count + 1});};
-   var Upd0 = function (a) {    return {ctor: "Upd0",_0: a};};
+   var m0 = $Material$Textfield.model;
+   var Login = function (a) {    return {ctor: "Login",_0: a};};
+   var Username = function (a) {    return {ctor: "Username",_0: a};};
+   var Password = function (a) {    return {ctor: "Password",_0: a};};
    var MDL = function (a) {    return {ctor: "MDL",_0: a};};
-   var field0 = A4($Material$Textfield.instance,0,MDL,$Material$Textfield.model,_U.list([$Material$Textfield.fwdInput(Upd0)]));
-   var transferToDisabled = function (str) {    return field0.map(function (m) {    return _U.update(m,{value: str});});};
-   var ResetButtonAction = function (a) {    return {ctor: "ResetButtonAction",_0: a};};
-   var IncreaseButtonAction = function (a) {    return {ctor: "IncreaseButtonAction",_0: a};};
-   var update = F2(function (action,model) {
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "MDL": return A2(map1st,function (mdl$) {    return _U.update(model,{mdl: mdl$});},A3($Material.update,MDL,_p2._0,model.mdl));
-         case "IncreaseButtonAction": var _p5 = _p2._0;
-           var model$ = function () {    var _p3 = _p5;if (_p3.ctor === "Click") {    return increase(model);} else {    return model;}}();
-           var _p4 = A2($Material$Button.update,_p5,model.increaseButtonModel);
-           var submodel = _p4._0;
-           var fx = _p4._1;
-           return {ctor: "_Tuple2",_0: _U.update(model$,{increaseButtonModel: submodel}),_1: A2($Effects.map,IncreaseButtonAction,fx)};
-         case "ResetButtonAction": var _p8 = _p2._0;
-           var model$ = function () {    var _p6 = _p8;if (_p6.ctor === "Click") {    return reset(model);} else {    return model;}}();
-           var _p7 = A2($Material$Button.update,_p8,model.resetButtonModel);
-           var submodel = _p7._0;
-           var fx = _p7._1;
-           return {ctor: "_Tuple2",_0: _U.update(model$,{resetButtonModel: submodel}),_1: A2($Effects.map,ResetButtonAction,fx)};
-         default: var model$ = _U.update(model,{mdl: A2(transferToDisabled,_p2._0,model.mdl)});
-           return {ctor: "_Tuple2",_0: model$,_1: $Effects.none};}
-   });
+   var username = A4($Material$Textfield.instance,
+   0,
+   MDL,
+   _U.update(m0,{label: $Maybe.Just({text: "Username",$float: true})}),
+   _U.list([$Material$Textfield.fwdInput(Username)]));
+   var password = A4($Material$Textfield.instance,
+   1,
+   MDL,
+   _U.update(m0,{label: $Maybe.Just({text: "Password",$float: true})}),
+   _U.list([$Material$Textfield.fwdInput(Password)]));
    var view = F2(function (addr,model) {
       return $Material$Scheme.top(A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin",_1: "auto"}
                                               ,{ctor: "_Tuple2",_0: "padding-left",_1: "5%"}
                                               ,{ctor: "_Tuple2",_0: "padding-right",_1: "5%"}]))]),
-      _U.list([$Html.text(A2($Basics._op["++"],"Current count: ",$Basics.toString(model.count)))
-              ,A4($Material$Button.flat,A2($Signal.forwardTo,addr,IncreaseButtonAction),model.increaseButtonModel,_U.list([]),_U.list([$Html.text("Increase")]))
-              ,A4($Material$Button.flat,A2($Signal.forwardTo,addr,ResetButtonAction),model.resetButtonModel,_U.list([]),_U.list([$Html.text("Reset")]))
-              ,A3(field0.view,addr,model.mdl,_U.list([]))])));
+      _U.list([A2($Html.div,_U.list([]),_U.list([A3(username.view,addr,model.mdl,_U.list([]))]))
+              ,A2($Html.div,
+              _U.list([]),
+              _U.list([A3(password.view,addr,model.mdl,_U.list([]))
+                      ,A4($Material$Button.flat,A2($Signal.forwardTo,addr,Login),model.login,_U.list([]),_U.list([$Html.text("Login")]))]))])));
    });
-   var model = {count: 0,increaseButtonModel: $Material$Button.model(true),resetButtonModel: $Material$Button.model(false),mdl: $Material.model};
+   var match = F2(function (str,rx) {
+      return A2($List.any,
+      function (_p0) {
+         return A2(F2(function (x,y) {    return _U.eq(x,y);}),str,function (_) {    return _.match;}(_p0));
+      },
+      A3($Regex.find,$Regex.All,rx,str));
+   });
+   var checkRegex = F4(function (str,_p1,mdl,textField) {
+      var _p2 = _p1;
+      var value4 = function (_) {    return _.value;}(textField.get(mdl));
+      return A2(textField.map,function (m) {    return _U.update(m,{error: A2(match,value4,_p2._1) ? $Maybe.Nothing : $Maybe.Just(_p2._0)});},mdl);
+   });
+   var setRegex = function (str) {    return {ctor: "_Tuple2",_0: str,_1: $Regex.regex(str)};};
+   var map1st = F2(function (f,_p3) {    var _p4 = _p3;return {ctor: "_Tuple2",_0: f(_p4._0),_1: _p4._1};});
+   var update = F2(function (action,model) {
+      var _p5 = action;
+      switch (_p5.ctor)
+      {case "MDL": return A2(map1st,function (mdl$) {    return _U.update(model,{mdl: mdl$});},A3($Material.update,MDL,_p5._0,model.mdl));
+         case "Login": var _p8 = _p5._0;
+           var model$ = function () {    var _p6 = _p8;if (_p6.ctor === "Click") {    return model;} else {    return model;}}();
+           var _p7 = A2($Material$Button.update,_p8,model.login);
+           var submodel = _p7._0;
+           var fx = _p7._1;
+           return {ctor: "_Tuple2",_0: _U.update(model$,{login: submodel}),_1: A2($Effects.map,Login,fx)};
+         case "Username": return {ctor: "_Tuple2",_0: _U.update(model,{mdl: A4(checkRegex,_p5._0,model.rx,model.mdl,username)}),_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{mdl: A4(checkRegex,_p5._0,model.rx,model.mdl,password)}),_1: $Effects.none};}
+   });
+   var model = {count: 0,mdl: $Material.model,rx: {ctor: "_Tuple2",_0: "Numbers Please",_1: $Regex.regex("[0-9]*")},login: $Material$Button.model(true)};
    var init = {ctor: "_Tuple2",_0: model,_1: $Effects.none};
    var app = $StartApp.start({init: init,view: view,update: update,inputs: inputs});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
-   var Model = F4(function (a,b,c,d) {    return {count: a,increaseButtonModel: b,resetButtonModel: c,mdl: d};});
+   var Model = F4(function (a,b,c,d) {    return {count: a,mdl: b,rx: c,login: d};});
    return _elm.Main.values = {_op: _op
                              ,Model: Model
                              ,model: model
-                             ,IncreaseButtonAction: IncreaseButtonAction
-                             ,ResetButtonAction: ResetButtonAction
-                             ,MDL: MDL
-                             ,Upd0: Upd0
-                             ,increase: increase
-                             ,reset: reset
                              ,map1st: map1st
+                             ,setRegex: setRegex
+                             ,match: match
+                             ,checkRegex: checkRegex
+                             ,MDL: MDL
+                             ,Password: Password
+                             ,Username: Username
+                             ,Login: Login
                              ,update: update
-                             ,transferToDisabled: transferToDisabled
-                             ,field0: field0
+                             ,m0: m0
+                             ,username: username
+                             ,password: password
                              ,view: view
                              ,init: init
                              ,inputs: inputs

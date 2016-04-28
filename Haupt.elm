@@ -9,97 +9,113 @@ import Material.Textfield as Textfield
 import Material.Scheme
 import Material
 
+import Regex
+
 --import Material.Helpers
 
 -- MODEL
 
 type alias Model =
   { count : Int
-  , increaseButtonModel : Button.Model
-  , resetButtonModel : Button.Model
   , mdl : Material.Model
+  , rx : (String, Regex.Regex)
+  , login : Button.Model
   }
 
 
 model : Model
 model =
   { count = 0
-  , increaseButtonModel = Button.model True -- With ripple animation
-  , resetButtonModel = Button.model False   -- Without ripple animation
   , mdl = Material.model
+  , rx = ("Numbers Please", Regex.regex "[0-9]*")
+  , login = Button.model True -- With ripple animation
   }
 
 
 -- ACTION, UPDATE
 
 
-type Action
-  = IncreaseButtonAction Button.Action
-  | ResetButtonAction Button.Action
-  | MDL (Material.Action Action)
-  | Upd0 String
-
-
-increase : Model -> Model
-increase model =
-  { model | count = model.count + 1 }
-
-
-reset : Model -> Model
-reset model =
-   { model | count = 0 }
-
-
+--helpers didn't load for some reason...
 map1st : (a -> c) -> (a,b) -> (c,b)
 map1st f (x,y) = (f x, y)
+
+--check
+setRegex : String -> (String, Regex.Regex)
+setRegex str = (str, Regex.regex str)
+
+match : String -> Regex.Regex -> Bool
+match str rx =
+  Regex.find Regex.All rx str
+    |> List.any (.match >> (==) str)
+
+checkRegex : String -> (String, Regex.Regex) -> Material.Model -> Textfield.Instance Material.Model Action -> Material.Model
+checkRegex str (rx', rx) mdl textField =
+  let
+    value4 = textField.get mdl |> .value
+  in
+    mdl |> textField.map (\m -> { m | error =
+      if match value4 rx then
+        Nothing
+      else
+        rx' |> Just
+      })
+
+
+type Action
+  = MDL (Material.Action Action)
+  | Password String
+  | Username String
+  | Login Button.Action
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
+    --updates models in MDL model
     MDL action' ->
       Material.update MDL action' model.mdl
         |> map1st (\mdl' -> { model | mdl = mdl' })
-    IncreaseButtonAction action' ->
+    Login a ->
       let
         (submodel, fx) =
-          Button.update action' model.increaseButtonModel
+          Button.update a model.login
         model' =
-          case action' of
+          case a of
             Button.Click ->
-              increase model
+              model
             _ ->
               model
       in
-        ( { model' | increaseButtonModel = submodel }
-        , Effects.map IncreaseButtonAction fx
+        ( { model' | login = submodel }
+        , Effects.map Login fx
         )
-    ResetButtonAction action' ->
-      let
-        (submodel, fx) =
-          Button.update action' model.resetButtonModel
-        model' =
-          case action' of
-            Button.Click ->
-              reset model
-            _ ->
-              model
-      in
-        ( { model' | resetButtonModel = submodel }
-        , Effects.map ResetButtonAction fx
-        )
-    Upd0 str ->
-      let
-        model' = { model | mdl = transferToDisabled str model.mdl }
-      in
-        ( model' , Effects.none )
+    Username str ->
+      --have to refer to initial model in order to do regex check...
+      ( { model | mdl = checkRegex str model.rx model.mdl username }
+      , Effects.none
+      )
+    Password str ->
+      ( { model | mdl = checkRegex str model.rx model.mdl password }
+      , Effects.none
+      )
 
+--instantiate textfield model
+m0 : Textfield.Model
+m0 = Textfield.model
 
 -- VIEW
-transferToDisabled : String -> Material.Model -> Material.Model
-transferToDisabled str = field0.map (\m -> { m | value = str } )
+username : Textfield.Instance Material.Model Action
+username =
+  --unique id int identifies components
+  Textfield.instance 0 MDL
+    { m0 | label = Just {  text = "Username", float = True } }
+    [ Textfield.fwdInput Username ]
 
-field0 : Textfield.Instance Material.Model Action
-field0 = Textfield.instance 0 MDL Textfield.model [ Textfield.fwdInput Upd0 ]
+password : Textfield.Instance Material.Model Action
+password =
+  Textfield.instance 1 MDL
+    { m0 | label = Just {  text = "Password", float = True } }
+    [ Textfield.fwdInput Password ]
 
 view : Signal.Address Action -> Model -> Html
 view addr model =
@@ -110,20 +126,15 @@ view addr model =
       , ("padding-right", "5%")
       ]
     ]
-    [ text ("Current count: " ++ toString model.count )
-    , Button.flat
-        (Signal.forwardTo addr IncreaseButtonAction)
-        model.increaseButtonModel
-        []
-        [ text "Increase" ]
-    , Button.flat
-        (Signal.forwardTo addr ResetButtonAction)
-        model.resetButtonModel
-        []
-        [ text "Reset" ]
-    , field0.view addr model.mdl []
-
+    [ div [] [ username.view addr model.mdl [] ]
+    , div []
+      [ password.view addr model.mdl []
+      --on button press go to new screen
+      --use hop / router
+      , Button.flat (Signal.forwardTo addr Login) model.login [] [ text "Login" ]
+      ]
     ]
+  --css "scheme" loader
   |> Material.Scheme.top
 
 
@@ -139,14 +150,11 @@ init = (model, Effects.none)
 
 
 inputs : List (Signal.Signal Action)
-inputs =
-  [
-  ]
+inputs = []
 
 
 app : StartApp.App Model
-app =
-    StartApp.start
+app = StartApp.start
       { init = init
       , view = view
       , update = update
