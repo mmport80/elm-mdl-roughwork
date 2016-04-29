@@ -9,7 +9,7 @@ import Hop.Navigate exposing (navigateTo, setQuery)
 import Hop.Types exposing (Config, Query, Location, PathMatcher, Router, newLocation)
 import Material.Button as Button
 import Pages.Login exposing (..)
-import Layout exposing (..)
+import Pages.Layout exposing (..)
 
 
 -- MODEL
@@ -19,7 +19,7 @@ type alias Model =
   { location : Location
   , route : Route
   , loginPage : Pages.Login.Model
-  , layoutPage : Layout.Model
+  , layoutPage : Pages.Layout.Model
   }
 
 
@@ -28,7 +28,7 @@ newModel =
   { location = newLocation
   , route = LoginRoute
   , loginPage = Pages.Login.model
-  , layoutPage = Layout.model
+  , layoutPage = Pages.Layout.model
   }
 
 
@@ -73,7 +73,7 @@ type Action
   | NavigateTo String
   | SetQuery Query
   | LoginPage Pages.Login.Action
-  | Layout Layout.Action
+  | Layout Pages.Layout.Action
 
 
 update : Action -> Model -> ( Model, Effects Action )
@@ -123,7 +123,7 @@ update action model =
     Layout input ->
       let
         ( layoutPage, fx ) =
-          Layout.update input model.layoutPage
+          Pages.Layout.update input model.layoutPage
 
         model' =
           { model | layoutPage = layoutPage }
@@ -164,4 +164,4 @@ pageView address model =
       div [] [ Pages.Login.view (Signal.forwardTo address LoginPage) model.loginPage ]
 
     LayoutRoute ->
-      div [] [ Layout.view (Signal.forwardTo address Layout) model.layoutPage ]
+      div [] [ Pages.Layout.view (Signal.forwardTo address Layout) model.layoutPage ]

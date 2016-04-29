@@ -7,7 +7,7 @@ import Html exposing (Html)
 import Task exposing (Task)
 import Material.Layout
 import Material.Layout as Layout' exposing (defaultLayoutModel)
-import Layout
+import Pages.Layout
 
 
 init : ( Model, Effects Action )
@@ -30,9 +30,9 @@ app =
     }
 
 
-inputs : List (Signal.Signal Layout.Action)
+inputs : List (Signal.Signal Pages.Layout.Action)
 inputs =
-  [ Layout'.setupSignals Layout.LayoutAction ]
+  [ Layout'.setupSignals Pages.Layout.LayoutAction ]
 
 
 main : Signal Html
