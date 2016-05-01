@@ -1,6 +1,6 @@
 module Main (..) where
 
-import Router exposing (..)
+import Router exposing (router)
 import StartApp exposing (App)
 import Effects exposing (Effects, Never)
 import Html exposing (Html)
@@ -10,23 +10,25 @@ import Material.Layout as Layout' exposing (defaultLayoutModel)
 import Pages.Layout
 
 
-init : ( Model, Effects Action )
+init : ( Router.Model, Effects Router.Action )
 init =
-  ( Router.newModel, Effects.none )
+  ( Router.model, Effects.none )
 
 
-taggedRouterSignal : Signal Action
+taggedRouterSignal : Signal Router.Action
 taggedRouterSignal =
-  Signal.map ApplyRoute router.signal
+  Signal.map Router.ApplyRoute router.signal
 
 
-app : StartApp.App Model
+app : StartApp.App Router.Model
 app =
   StartApp.start
     { init = init
-    , update = update
-    , view = view
-    , inputs = [ taggedRouterSignal ]
+    , update = Router.update
+    , view = Router.view
+    , inputs =
+        [ taggedRouterSignal ]
+        --
     }
 
 

@@ -1,15 +1,15 @@
 module Router (..) where
 
 import Effects exposing (Effects, Never)
-import Html exposing (..)
+import Html exposing (div, Html, h2, text)
 import Html.Attributes exposing (class)
 import Hop
-import Hop.Matchers exposing (..)
+import Hop.Matchers exposing (match1)
 import Hop.Navigate exposing (navigateTo, setQuery)
 import Hop.Types exposing (Config, Query, Location, PathMatcher, Router, newLocation)
 import Material.Button as Button
-import Pages.Login exposing (..)
-import Pages.Layout exposing (..)
+import Pages.Login exposing (update, Action)
+import Pages.Layout exposing (Model, model, Page)
 
 
 -- MODEL
@@ -23,8 +23,8 @@ type alias Model =
   }
 
 
-newModel : Model
-newModel =
+model : Model
+model =
   { location = newLocation
   , route = LoginRoute
   , loginPage = Pages.Login.model
@@ -40,12 +40,18 @@ type Route
   = NotFoundRoute
   | LoginRoute
   | LayoutRoute
+  | ToolOneRoute
+  | ToolTwoRoute
+  | ToolThreeRoute
 
 
 matchers : List (PathMatcher Route)
 matchers =
   [ match1 LoginRoute ""
   , match1 LayoutRoute "/layout"
+  , match1 ToolOneRoute "/toolone"
+  , match1 ToolTwoRoute "/tooltwo"
+  , match1 ToolThreeRoute "/toolthree"
   ]
 
 
@@ -86,10 +92,48 @@ update action model =
       ( model, Effects.map HopAction (setQuery routerConfig query model.location) )
 
     ApplyRoute ( route, location ) ->
-      ( { model | route = route, location = location }, Effects.none )
+      --only works when press enter on route, then sticky until next time
+      --perhaps move to navigateto?
+      --or hop action?!?!
+      let
+        layoutPage' =
+          model.layoutPage
+
+        --match routes to page types from layout module
+        currentPage =
+          case route of
+            ToolOneRoute ->
+              Pages.Layout.One
+
+            ToolTwoRoute ->
+              Pages.Layout.Two
+
+            _ ->
+              Pages.Layout.Three
+      in
+        --send through route?
+        --import page options from layout?
+        --link routes with pages?
+        ( { model
+            | route = route
+            , location = location
+            , layoutPage = { layoutPage' | currentPage = currentPage }
+          }
+        , Effects.none
+        )
 
     HopAction () ->
       ( model, Effects.none )
+
+    Layout input ->
+      let
+        ( layoutPage, fx ) =
+          Pages.Layout.update input model.layoutPage
+
+        model' =
+          { model | layoutPage = layoutPage }
+      in
+        ( model', Effects.map Layout fx )
 
     LoginPage input ->
       --case button click, nav to
@@ -104,7 +148,7 @@ update action model =
           ( model', Effects.map LoginPage fx )
       in
         case input of
-          LoginButton a ->
+          Pages.Login.LoginButton a ->
             case a of
               Button.Click ->
                 ( model'
@@ -120,16 +164,6 @@ update action model =
           _ ->
             default
 
-    Layout input ->
-      let
-        ( layoutPage, fx ) =
-          Pages.Layout.update input model.layoutPage
-
-        model' =
-          { model | layoutPage = layoutPage }
-      in
-        ( model', Effects.map Layout fx )
-
 
 
 -- VIEW
@@ -143,17 +177,6 @@ view address model =
     ]
 
 
-currentQuery : Model -> Html
-currentQuery model =
-  let
-    query =
-      toString model.location.query
-  in
-    span
-      [ class "labelQuery" ]
-      [ text query ]
-
-
 pageView : Signal.Address Action -> Model -> Html
 pageView address model =
   case model.route of
@@ -163,5 +186,5 @@ pageView address model =
     LoginRoute ->
       div [] [ Pages.Login.view (Signal.forwardTo address LoginPage) model.loginPage ]
 
-    LayoutRoute ->
+    _ ->
       div [] [ Pages.Layout.view (Signal.forwardTo address Layout) model.layoutPage ]

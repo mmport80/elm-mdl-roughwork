@@ -1,6 +1,6 @@
 module Pages.Login (..) where
 
-import Html exposing (..)
+import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (href, class, style)
 import Effects exposing (Effects, Never)
 import Material.Textfield as Textfield
@@ -86,14 +86,6 @@ update action model =
         )
 
 
-
---helpers didn't load for some reason...
--- map1st : (a -> c) -> ( a, b ) -> ( c, b )
--- map1st f ( x, y ) =
---   ( f x, y )
---regex stuff
-
-
 checkRegex : String -> ( String, Regex.Regex ) -> Material.Model -> Textfield.Instance Material.Model Action -> Material.Model
 checkRegex str ( rx', rx ) mdl textField =
   let
@@ -154,7 +146,8 @@ view addr model =
 
 
 
---instantiate textfield model
+--need this to make updates to model
+--dot breaks '|' updates
 
 
 m0 : Textfield.Model
