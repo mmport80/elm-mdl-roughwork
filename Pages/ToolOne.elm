@@ -15,6 +15,9 @@ import Effects exposing (Effects, Never)
 
 import Material.Scheme
 import Material.Helpers as Helpers
+import Material.Elevation as Elevation
+import Material.Style as Style exposing (Style)
+
 import Material
 import Dict
 import Maybe
@@ -79,16 +82,24 @@ view address model =
   let
     rs =
       generateData data 5
+    detailedRow = rs |> List.drop model.partitionAt >> List.head
   in
     div
-      [ style [ ( "width", "100%" ), ( "height", "100%" ) ], onClick address (Partition largeInt) ]
+      [
+        style [ ( "width", "100%" ), ( "min-height", "100%" ) ]
+      , onClick address (Partition largeInt) ]
       [ div
-          []
+          [ style [("width","20%"), ("margin", "0 auto")] ]
           (header rs
             ++ (rows address rs
                   |> List.take model.partitionAt
                )
           )
+      , case detailedRow of
+        Just h ->
+          Style.div [ Elevation.e4 ] [text "xoxoxoxoxoxoxxotun"]
+        _ ->
+          warningMsg
       , div
           []
           (rows address rs
@@ -105,10 +116,6 @@ cellStyle =
     , ( "padding", "1em" )
     ]
 
-
-table : Signal.Address Action -> List Data -> List Html
-table address rs =
-  (header rs) ++ (rows address rs)
 
 
 
@@ -137,8 +144,10 @@ header rs =
       ]
 
     _ ->
-      [ div [] [ text "no data" ] ]
+      [warningMsg]
 
+warningMsg : Html
+warningMsg =  div [] [ text "no data" ]
 
 generateData : Data -> Int -> List Data
 generateData d rows =
@@ -174,19 +183,22 @@ rows : Signal.Address Action -> List Data -> List Html
 rows address =
   List.indexedMap
     (\index r ->
-      div
-        [ style
-            [ ( "display", "table-row" )
-            , ( "cursor", "pointer" )
-            ]
-        , onKlick address (Partition index)
-        ]
-        (Dict.toList r
-          |> List.map
-              (\( _, c ) ->
-                div
-                  [ cellStyle ]
-                  [ index |> toString >> text ]
-              )
-        )
+      Style.div [Elevation.e2]
+        [
+        div
+          [ style
+              [ ( "display", "table-row" )
+              , ( "cursor", "pointer" )
+              ]
+          , onKlick address (Partition index)
+          ]
+          (Dict.toList r
+            |> List.map
+                (\( _, c ) ->
+                  div
+                    [ cellStyle ]
+                    [ index |> toString >> text ]
+                )
+          )
+          ]
     )
