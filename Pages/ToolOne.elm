@@ -189,6 +189,7 @@ rows address =
           [ style
               [ ( "display", "table-row" )
               , ( "cursor", "pointer" )
+              , ( "border-width", "0em" )
               ]
           , onKlick address (Partition index)
           ]
