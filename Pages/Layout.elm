@@ -13,7 +13,7 @@ import Signal
 
 import Material.Color as Color
 import Material.Layout
-import Material.Layout as Layout exposing (defaultLayoutModel)
+import Material.Layout as Layout exposing (defaultLayoutModel, Mode)
 import Material.Helpers exposing (lift, lift')
 import Material.Scheme as Scheme
 import Pages.ToolOne exposing (..)
