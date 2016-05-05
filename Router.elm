@@ -96,20 +96,18 @@ update action model =
       --perhaps move to navigateto?
       --or hop action?!?!
       let
-        layoutPage' =
+        layoutPage =
           model.layoutPage
 
         --match routes to page types from layout module
-        currentPage =
+        layoutPage' =
           case route of
-            ToolOneRoute ->
-              Pages.Layout.One
-
             ToolTwoRoute ->
-              Pages.Layout.Two
-
+              { layoutPage | currentPage = Pages.Layout.Two }
+            ToolThreeRoute ->
+              { layoutPage | currentPage = Pages.Layout.Three }
             _ ->
-              Pages.Layout.Three
+              { layoutPage | currentPage = Pages.Layout.One }
       in
         --send through route?
         --import page options from layout?
@@ -117,7 +115,7 @@ update action model =
         ( { model
             | route = route
             , location = location
-            , layoutPage = { layoutPage' | currentPage = currentPage }
+            , layoutPage = layoutPage'
           }
         , Effects.none
         )

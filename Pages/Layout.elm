@@ -20,6 +20,7 @@ import Pages.ToolOne exposing (..)
 import Pages.ToolTwo exposing (..)
 import Pages.ToolThree exposing (..)
 
+import Debug
 
 -- MODEL
 
@@ -39,7 +40,6 @@ type alias Model =
       Pages.ToolThree.Model
   , currentPage :
       Page
-      -- , currentPage : Signal.Address Action -> Html
   }
 
 
@@ -76,13 +76,15 @@ type Action
 
 update : Action -> Model -> ( Model, Effects Action )
 update action model =
-  case action of
+  case Debug.log "Layout action " action of
     LayoutAction a ->
       let
         ( lifted, layoutFx ) =
           lift .layout (\m x -> { m | layout = x }) LayoutAction Layout.update a model
+
       in
-        ( lifted, Effects.batch [ layoutFx ] )
+        ( lifted
+        , Effects.batch [ layoutFx ] )
 
     --one action per page
     --each page maps to a component
@@ -124,6 +126,13 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
+    h = case model.currentPage of
+        Two ->
+          "Tool Two"
+        Three ->
+          "Tool Three"
+        _ ->
+          "Tool One"
     t =
       case model.currentPage of
         One ->
@@ -139,7 +148,7 @@ view address model =
     Layout.view
       (Signal.forwardTo address LayoutAction)
       model.layout
-      { header = header
+      { header = header h
       , drawer = drawer
       , tabs = []
       , main =
@@ -165,10 +174,10 @@ drawer =
   ]
 
 
-header : List Html
-header =
+header : String -> List Html
+header s =
   [ Layout.row
-      [ Layout.title "Mission Control"
+      [ Layout.title s
       , Layout.spacer
       , Layout.navigation
           [ Layout.link

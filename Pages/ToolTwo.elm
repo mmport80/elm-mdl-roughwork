@@ -1,8 +1,8 @@
 module Pages.ToolTwo (..) where
 
-import Html exposing (div, text, Html)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick, on, onWithOptions, defaultOptions)
+import Html exposing (div, text, Html, hr, a, span)
+import Html.Attributes exposing (style, href)
+--import Html.Events exposing (onClick, on, onWithOptions, defaultOptions)
 
 
 -- import Html.Attributes exposing (href, class, style)
@@ -19,7 +19,7 @@ import Material.Elevation as Elevation
 import Material.Style as Style exposing (Style, css)
 --
 --
--- import Dict
+import Dict
 -- import Maybe
 -- import Json.Decode as Json
 
@@ -90,12 +90,40 @@ view address model =
           ]
           ]
       [
-          grouping
-        , item, item, item, item
-        , grouping
-        , item, item, item, item
-        , grouping
-        , item, item, item, item
+          grouping "Today"
+        , item
+        , item
+        , grouping  "This Week"
+        , item
+        , grouping  "This Week"
+        , openGroup
+          [ grouping  "Yoyo"
+          , item
+          , item
+          , grouping  "Xoxo"
+          , openGroup
+            [ div [ style [ ("border-top","1px solid grey"),( "display", "table-row" ),("border-collapse", "collapse"),("padding-top","2em")] ] --style [("display","block")]
+              [ span [ style ([("width","25%") ] ++ cellStyle) ] [ text "Details" ]
+              , span [ style ([("width","75%") ] ++ cellStyle) ] [ text "" ]
+              ]
+            , datum
+            , datum
+            , datum
+            , div [ style [ ("border-top","1px solid grey"),( "display", "table-row" ),("padding-top","2em")] ] --style [("display","block")]
+              [ span [ style ([("width","25%") ] ++ cellStyle) ] [ text "more..." ]
+              , span [ style ([("width","75%") ] ++ cellStyle) ] [ text "" ]
+              ]
+            --, a [href "ojoj"] [text "more..."]
+            ]
+          , item
+          ]
+        , item
+
+        , grouping  "This Month"
+        , item
+        , item
+        , item
+        , item
        ]
       |> Material.Scheme.top
 
@@ -103,6 +131,18 @@ view address model =
 --more groupings
 --more items
 --click further to see detail
+
+datum =
+  div [ style [ ("border-top","1px solid black"),( "display", "table-row" ),("padding-top","2em")] ] --style [("display","block")]
+    [ span [ style ([("width","25%") ] ++ cellStyle) ] [ text "Attribute A" ]
+    , span [ style ([("width","75%") ] ++ cellStyle) ] [ text "abababababa" ]
+    ]
+
+cellStyle : List (String, String)
+cellStyle =
+    [ ( "display", "table-cell" )
+    , ( "padding", "1em" )
+    ]
 
 item : Html
 item =
@@ -112,11 +152,31 @@ item =
       Elevation.e2
       , css "margin" "2em"
       , css "padding" "1em"
+      , css "cursor" "pointer"
       ]
       [text "txtxtxtxtxtx"]
     ]
 
-grouping : Html
-grouping = div
-  [ style [("padding","1em"),("display","block")] ]
-  [ text "grouping" ]
+grouping : String -> Html
+grouping s = div
+  [ style
+    [ ("padding","1em")
+    , ("display","block")
+    ]
+  ]
+  [ text s ]
+
+--group with list of groups underneath
+--open as in a user has clicked to see contents
+openGroup : List Html -> Html
+openGroup lh = Style.div
+  [ Elevation.e2
+  , css "display" "block"
+  , css "padding" "1em"
+  ]
+  lh
+
+details : Dict.Dict -> List Html
+details d =
+  [ grouping "OIOI"
+  ]
