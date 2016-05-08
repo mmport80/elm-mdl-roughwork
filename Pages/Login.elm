@@ -1,7 +1,7 @@
 module Pages.Login (..) where
 
-import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (href, class, style)
+import Html exposing (Html, div, span, text, img)
+import Html.Attributes exposing (href, class, style, src)
 import Effects exposing (Effects, Never)
 import Material.Textfield as Textfield
 import Material.Button as Button
@@ -118,8 +118,19 @@ match str rx =
 view : Signal.Address Action -> Model -> Html
 view addr model =
   div
-    []
-    [ div
+    [ style
+        [ ( "margin", "0 auto" )
+        , ( "width", "40%" )
+        ]
+    ]
+    [ img
+        [ src "http://localhost:8000/logo.jpg"
+        , style
+            [ ( "width", "100%" )
+            ]
+        ]
+        []
+    , div
         []
         [ username.view addr model.mdl [] ]
     , div
@@ -128,12 +139,7 @@ view addr model =
             []
             [ password.view addr model.mdl [] ]
         , span
-            [ style
-                [ ( "margin", "auto" )
-                , ( "padding-left", "5%" )
-                , ( "padding-right", "5%" )
-                ]
-            ]
+            []
             [ Button.flat
                 (Signal.forwardTo addr LoginButton)
                 model.loginButton

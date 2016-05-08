@@ -2,9 +2,9 @@ module Pages.ToolTwo (..) where
 
 import Html exposing (div, text, Html, hr, a, span)
 import Html.Attributes exposing (style, href)
+
+
 --import Html.Events exposing (onClick, on, onWithOptions, defaultOptions)
-
-
 -- import Html.Attributes exposing (href, class, style)
 
 import Effects exposing (Effects, Never)
@@ -17,13 +17,19 @@ import Material.Scheme
 import Material.Helpers as Helpers
 import Material.Elevation as Elevation
 import Material.Style as Style exposing (Style, css)
+
+
 --
 --
+
 import Dict
+
+
 -- import Maybe
 -- import Json.Decode as Json
 
 import Material
+
 
 -- MODEL
 
@@ -80,101 +86,142 @@ update action model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-
-    div
-        [ style
-          [ ("max-width", "50em")
-          , ("min-width", "10em")
-          , ("width", "100%")
-          , ("margin", "1em auto")
-          ]
-          ]
-      [
-          grouping "Today"
-        , item
-        , item
-        , grouping  "This Week"
-        , item
-        , grouping  "This Week"
+  div
+    [ style
+        [ ( "max-width", "50em" )
+        , ( "min-width", "10em" )
+        , ( "width", "100%" )
+        , ( "margin", "1em auto" )
+        ]
+    ]
+    [ grouping "Today"
+    , item "North"
+    , item "South"
+    , grouping "This Week"
+    , item "East"
+    , openGroup
+        [ grouping "North"
+        , item "Red"
+        , item "Blue"
         , openGroup
-          [ grouping  "Yoyo"
-          , item
-          , item
-          , grouping  "Xoxo"
-          , openGroup
-            [ div [ style [ ("border-top","1px solid grey"),( "display", "table-row" ),("border-collapse", "collapse"),("padding-top","2em")] ] --style [("display","block")]
-              [ span [ style ([("width","25%") ] ++ cellStyle) ] [ text "Details" ]
-              , span [ style ([("width","75%") ] ++ cellStyle) ] [ text "" ]
-              ]
-            , datum
-            , datum
-            , datum
-            , div [ style [ ("border-top","1px solid grey"),( "display", "table-row" ),("padding-top","2em")] ] --style [("display","block")]
-              [ span [ style ([("width","25%") ] ++ cellStyle) ] [ text "more..." ]
-              , span [ style ([("width","75%") ] ++ cellStyle) ] [ text "" ]
-              ]
-            --, a [href "ojoj"] [text "more..."]
+            [ grouping "Green"
+            , div
+                [ style [ ( "display", "table" ), ( "border-collapse", "collapse" ), ( "width", "100%" ) ] ]
+                [ div
+                    [ style rowStyle ]
+                    [ span [ style cellStyle ] [ text "" ]
+                    , span [ style cellStyle ] [ text "" ]
+                    ]
+                , div
+                    [ style rowStyle ]
+                    --style [("display","block")]
+                    [ span [ style cellStyle ] [ text "Attribute A" ]
+                    , span [ style cellStyle ] [ text "10101010101010" ]
+                    ]
+                , datum "Attribute B" "42"
+                , datum "Attribute C" "112"
+                , div
+                    [ style rowStyle ]
+                    [ span [ style cellStyle ] [ text "" ]
+                    , span [ style cellStyle ] [ text "" ]
+                    ]
+                  -- more
+                , div
+                    [ style rowStyle ]
+                    --style [("display","block")]
+                    [ span [ style cellStyle ] [ a [ href "xoxo" ] [ text "More..." ] ]
+                    , span [ style cellStyle ] [ text "" ]
+                    ]
+                ]
+              --, a [href "ojoj"] [text "more..."]
             ]
-          , item
-          ]
-        , item
+        , item "Purple"
+        ]
+    , item "West"
+    , grouping "This Month"
+    , item "North"
+    , item "East"
+    , item "West"
+    , item "South"
+    ]
+    |> Material.Scheme.top
 
-        , grouping  "This Month"
-        , item
-        , item
-        , item
-        , item
-       ]
-      |> Material.Scheme.top
 
---click, then 'drill down'
---more groupings
---more items
---click further to see detail
-
-datum =
-  div [ style [ ("border-top","1px solid black"),( "display", "table-row" ),("padding-top","2em")] ] --style [("display","block")]
-    [ span [ style ([("width","25%") ] ++ cellStyle) ] [ text "Attribute A" ]
-    , span [ style ([("width","75%") ] ++ cellStyle) ] [ text "abababababa" ]
+datum : String -> String -> Html
+datum k v =
+  div
+    [ style (rowStyle ++ lineStyle) ]
+    [ span [ style (leftCellStyle ++ cellStyle) ] [ text k ]
+    , span [ style (rightCellStyle ++ cellStyle) ] [ text v ]
     ]
 
-cellStyle : List (String, String)
+
+rowStyle : List ( String, String )
+rowStyle =
+  [ ( "display", "table-row" ), ( "padding-top", "2em" ) ]
+
+
+lineStyle : List ( String, String )
+lineStyle =
+  [ ( "border-top", "thin solid lightgray" ) ]
+
+
+cellStyle : List ( String, String )
 cellStyle =
-    [ ( "display", "table-cell" )
-    , ( "padding", "1em" )
+  [ ( "display", "table-cell" )
+  , ( "padding", "1em" )
+  ]
+
+
+rightCellStyle : List ( String, String )
+rightCellStyle =
+  [ ( "width", "75%" ) ]
+
+
+leftCellStyle : List ( String, String )
+leftCellStyle =
+  [ ( "width", "25%" ) ]
+
+
+item : String -> Html
+item s =
+  div
+    []
+    [ Style.div
+        [ Elevation.e2
+        , css "margin" "2em"
+        , css "padding" "1em"
+        , css "cursor" "pointer"
+        ]
+        [ text s ]
     ]
 
-item : Html
-item =
-  div []
-    [
-    Style.div [
-      Elevation.e2
-      , css "margin" "2em"
-      , css "padding" "1em"
-      , css "cursor" "pointer"
-      ]
-      [text "txtxtxtxtxtx"]
-    ]
 
 grouping : String -> Html
-grouping s = div
-  [ style
-    [ ("padding","1em")
-    , ("display","block")
+grouping s =
+  div
+    [ style
+        [ ( "padding", "1em" )
+        , ( "display", "block" )
+        ]
     ]
-  ]
-  [ text s ]
+    [ text s ]
+
+
 
 --group with list of groups underneath
 --open as in a user has clicked to see contents
+
+
 openGroup : List Html -> Html
-openGroup lh = Style.div
-  [ Elevation.e2
-  , css "display" "block"
-  , css "padding" "1em"
-  ]
-  lh
+openGroup lh =
+  Style.div
+    [ Elevation.e2
+    , css "display" "block"
+    , css "padding" "1em"
+    ]
+    lh
+
 
 details : Dict.Dict -> List Html
 details d =
