@@ -213,18 +213,36 @@ data2Dict : Data
 data2Dict =
   List.map Dict.fromList data
 
+-- groupBy : List String -> Data -> Maybe (Dict.Dict String (Maybe GroupedData))
+-- groupBy ss ds =
+--   case List.head ss of
+--     Just h ->
+--       case (groupBy' h ds) of
+--         Just r ->
+--           Dict.map (\k v -> groupBy' h v) r |> Just
+--         Nothing ->
+--           Nothing
+--
+--     --take list from this result
+--     --map with groupby
+--     --no more groupby strings, return ds straight
+--     Nothing ->
+--       Nothing
+
 
 groupBy : List String -> Data -> Maybe GroupedData
 groupBy ss ds =
-  case List.head ss of
-    Just h ->
-      groupBy' h ds
-
-    --take list from this result
-    --map with groupby
-    --no more groupby strings, return ds straight
-    Nothing ->
+  case ss of
+    [] ->
       Nothing
+    h :: [] ->
+      groupBy' h ds
+    h :: t ->
+      case groupBy' h ds of
+        Just r ->
+          Dict.map (\k v -> v) r |> Just
+        Nothing ->
+          Nothing
 
 
 groupBy' : String -> Data -> Maybe GroupedData
@@ -252,7 +270,7 @@ groupBy' s ds =
         Dict.empty
         ds
   in
-    --if no grouping was possible, return nothing
+    --if no grouping was not possible, return nothing
     if result == Dict.empty then
       Nothing
     else
